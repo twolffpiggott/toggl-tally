@@ -1,0 +1,32 @@
+# jupyter
+.ipynb_checkpoints
+_archive
+__pycache__
+
+# vscode
+.vscode/
+
+# data
+*.txt
+*.xlsx
+*.zip
+*.h5
+*.pkl
+*.tsv
+
+# python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# misc
+.DS_Store
+!requirements.txt
+/.env
+/.idea
+.utils/
+.venv/
+venv/
+*.log
+*.pem
+*.egg-info/
