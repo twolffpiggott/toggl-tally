@@ -1,5 +1,13 @@
 # Toggl Tally
 
+## Installation
+
+To install `toggl_tally`, run:
+
+```bash
+pip install --editable .
+```
+
 ## Development
 
 Code for this repository is checked using [pre-commit](https://pre-commit.com/).
