@@ -1,9 +1,10 @@
 import os
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, List, Union
 
 import requests
 from requests.exceptions import HTTPError
+from time_utils import get_current_timestamp
 
 
 class TogglAPI(object):
@@ -15,7 +16,6 @@ class TogglAPI(object):
         self.base_url = base_url
         self.headers = headers
         self.session = requests.Session()
-        self.auth()
 
     def auth(self):
         try:
@@ -26,8 +26,14 @@ class TogglAPI(object):
             ) from exception
         self.session.auth = (api_token, "api_token")
 
-    def get_time_entries(self):
-        current_timestamp = self._get_current_timestamp()
+    def get_time_entries_between(
+        self, start_date: datetime.datetime, end_date: datetime.datetime
+    ):
+        params = dict(start_date=start_date, end_date=end_date)
+        return self._call_toggl_api(f"{self.base_url}/me/time_entries", params=params)
+
+    def get_time_entries_to_date(self):
+        current_timestamp = get_current_timestamp()
         params = dict(before=current_timestamp)
         return self._call_toggl_api(f"{self.base_url}/me/time_entries", params=params)
 
@@ -43,6 +49,8 @@ class TogglAPI(object):
     def _call_toggl_api(
         self, url: str, params: Union[dict, None] = None
     ) -> Union[dict, None]:
+        if self.session.auth is None:
+            self.auth()
         kwargs = dict(headers=self.headers)
         if params is not None:
             kwargs["params"] = params
@@ -57,11 +65,3 @@ class TogglAPI(object):
             raise HTTPError(error_msg)
         else:
             response.raise_for_status()
-
-    @staticmethod
-    def _get_current_timestamp() -> str:
-        """
-        RFC3339 format https://developers.track.toggl.com/docs/api/time_entries
-        """
-        local_time = datetime.now(timezone.utc).astimezone()
-        return local_time.isoformat()
