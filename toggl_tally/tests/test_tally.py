@@ -78,3 +78,30 @@ def test_toggl_tally_last_billable_date(
     toggl_tally_object, expected_last_billable_date
 ):
     assert toggl_tally_object.last_billable_date == expected_last_billable_date
+
+
+@pytest.mark.parametrize(
+    "toggl_tally_object,expected_remaining_working_days",
+    [
+        pytest.param(
+            dict(now=datetime(2023, 3, 1), invoice_day_of_month=31),
+            22,
+            id="remaining_working_days_case_1",
+        ),
+        pytest.param(
+            dict(now=datetime(2023, 3, 1), invoice_day_of_month=31, skip_today=True),
+            21,
+            id="remaining_working_days_case_1_skip_today",
+        ),
+        pytest.param(
+            dict(now=datetime(2023, 3, 1), invoice_day_of_month=26),
+            18,
+            id="remaining_working_days_case_2",
+        ),
+    ],
+    indirect=["toggl_tally_object"],
+)
+def test_toggl_tally_remaining_working_days(
+    toggl_tally_object, expected_remaining_working_days
+):
+    assert toggl_tally_object.remaining_working_days == expected_remaining_working_days
