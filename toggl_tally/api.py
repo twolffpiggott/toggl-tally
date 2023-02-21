@@ -4,7 +4,8 @@ from typing import Dict, List, Union
 
 import requests
 from requests.exceptions import HTTPError
-from time_utils import get_current_timestamp
+
+from toggl_tally.time_utils import get_current_timestamp
 
 
 class TogglAPI(object):
@@ -26,9 +27,7 @@ class TogglAPI(object):
             ) from exception
         self.session.auth = (api_token, "api_token")
 
-    def get_time_entries_between(
-        self, start_date: datetime.datetime, end_date: datetime.datetime
-    ):
+    def get_time_entries_between(self, start_date: datetime, end_date: datetime):
         params = dict(start_date=start_date, end_date=end_date)
         return self._call_toggl_api(f"{self.base_url}/me/time_entries", params=params)
 
