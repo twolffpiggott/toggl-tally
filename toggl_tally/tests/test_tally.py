@@ -1,6 +1,10 @@
+import re
 from datetime import datetime
 
 import pytest
+from dateutil import rrule
+
+import toggl_tally.tally as sut
 
 
 @pytest.mark.parametrize(
@@ -105,3 +109,24 @@ def test_toggl_tally_remaining_working_days(
     toggl_tally_object, expected_remaining_working_days
 ):
     assert toggl_tally_object.remaining_working_days == expected_remaining_working_days
+
+
+def test_toggle_tally_rrule_day_strs():
+    expected_result = [
+        rrule.MO,
+        rrule.TU,
+        rrule.WE,
+        rrule.TH,
+        rrule.FR,
+        rrule.SA,
+        rrule.SU,
+    ]
+    sut._get_rrule_days(["MO", "TU", "WE", "TH", "FR", "SA", "SU"]) == expected_result
+
+
+def test_toggle_tally_rrule_day_strs_fails_for_invalid():
+    exception_match_str = re.escape(
+        'Working days should use the codes: ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]'
+    )
+    with pytest.raises(ValueError, match=exception_match_str):
+        sut._get_rrule_days(["MO", "FO"])

@@ -21,11 +21,12 @@ class TogglTally(object):
         skip_today: bool = False,
         timezone: Union[str, None] = None,
         working_days: List[str] = ["MO", "TU", "WE", "TH", "FR"],
+        country_str: str = "ZA",
     ):
         self.invoice_day_of_month = invoice_day_of_month
         self.skip_today = skip_today
         self.timezone = tz.gettz(timezone) if timezone is not None else None
-        self.working_days = [getattr(rrule, day_str) for day_str in working_days]
+        self.working_days = _get_rrule_days(working_days)
 
     @property
     def now(self):
@@ -101,3 +102,16 @@ def calculate_invoice_date(invoice_day_of_month: int, month: int, year: int):
     while invoice_date.weekday() > 4:  # Mon-Fri are 0-4
         invoice_date -= timedelta(days=1)
     return invoice_date
+
+
+def _get_rrule_days(day_strings: List[str]):
+    rrule_days = []
+    for day_str in day_strings:
+        try:
+            rrule_day = getattr(rrule, day_str)
+        except AttributeError:
+            raise ValueError(
+                'Working days should use the codes: ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]'
+            )
+        rrule_days.append(rrule_day)
+    return rrule_days
