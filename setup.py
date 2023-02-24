@@ -6,6 +6,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "click==8.1.3",
+        "holidays==0.19",
         "pytest==7.2.1",
         "requests==2.28.2",
     ],

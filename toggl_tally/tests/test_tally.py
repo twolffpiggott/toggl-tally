@@ -30,6 +30,16 @@ import toggl_tally.tally as sut
             datetime(2023, 2, 21),
             id="next_working_day_monday_skip_today",
         ),
+        pytest.param(
+            dict(now=datetime(2023, 2, 25), skip_today=False),
+            datetime(2023, 2, 27),
+            id="next_working_day_saturday",
+        ),
+        pytest.param(
+            dict(now=datetime(2023, 2, 25), skip_today=True),
+            datetime(2023, 2, 27),
+            id="next_working_day_saturday_skip_today",
+        ),
     ],
     indirect=["toggl_tally_object"],
 )
@@ -88,17 +98,30 @@ def test_toggl_tally_last_billable_date(
     "toggl_tally_object,expected_remaining_working_days",
     [
         pytest.param(
-            dict(now=datetime(2023, 3, 1), invoice_day_of_month=31),
+            dict(
+                now=datetime(2023, 3, 1),
+                invoice_day_of_month=31,
+                exclude_public_holidays=False,
+            ),
             22,
             id="remaining_working_days_case_1",
         ),
         pytest.param(
-            dict(now=datetime(2023, 3, 1), invoice_day_of_month=31, skip_today=True),
+            dict(
+                now=datetime(2023, 3, 1),
+                invoice_day_of_month=31,
+                skip_today=True,
+                exclude_public_holidays=False,
+            ),
             21,
             id="remaining_working_days_case_1_skip_today",
         ),
         pytest.param(
-            dict(now=datetime(2023, 3, 1), invoice_day_of_month=26),
+            dict(
+                now=datetime(2023, 3, 1),
+                invoice_day_of_month=26,
+                exclude_public_holidays=False,
+            ),
             18,
             id="remaining_working_days_case_2",
         ),

@@ -15,5 +15,6 @@ def toggl_tally_object(request):
         tally_object = TogglTally(
             invoice_day_of_month=kwargs.get("invoice_day_of_month", 1),
             skip_today=kwargs.get("skip_today", False),
+            exclude_public_holidays=kwargs.get("exclude_public_holidays", True),
         )
         yield tally_object
