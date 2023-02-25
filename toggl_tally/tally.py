@@ -15,7 +15,7 @@ class TogglTally(object):
     Responsible for:
     - Calculating the last and next invoice dates
     - Calculating the remaining working days for the current invoice
-    TODO check that invoice dates don't fall on public holidays
+    - Optionally excluding public holidays from invoiceable dates
     """
 
     def __init__(

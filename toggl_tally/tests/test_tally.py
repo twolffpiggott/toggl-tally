@@ -40,6 +40,16 @@ import toggl_tally.tally as sut
             datetime(2023, 2, 27),
             id="next_working_day_saturday_skip_today",
         ),
+        pytest.param(
+            dict(now=datetime(2023, 4, 7), skip_today=True),
+            datetime(2023, 4, 11),
+            id="next_working_day_za_public_holiday",
+        ),
+        pytest.param(
+            dict(now=datetime(2023, 4, 6), skip_today=True),
+            datetime(2023, 4, 11),
+            id="next_working_day_za_public_holiday_skip_today",
+        ),
     ],
     indirect=["toggl_tally_object"],
 )
@@ -61,6 +71,12 @@ def test_toggl_tally_next_working_day(toggl_tally_object, expected_next_working_
             datetime(2023, 1, 27),
             datetime(2023, 2, 28),
             id="invoice_date_last_month",
+        ),
+        pytest.param(
+            dict(now=datetime(2023, 3, 17), invoice_day_of_month=21),
+            datetime(2023, 2, 21),
+            datetime(2023, 3, 20),
+            id="invoice_date_current_month_public_holiday",
         ),
     ],
     indirect=["toggl_tally_object"],
@@ -84,6 +100,11 @@ def test_toggl_tally_invoice_dates(
             dict(now=datetime(2023, 3, 1), invoice_day_of_month=26),
             datetime(2023, 3, 24),
             id="last_billable_date_inclusive",
+        ),
+        pytest.param(
+            dict(now=datetime(2023, 3, 1), invoice_day_of_month=21),
+            datetime(2023, 3, 20),
+            id="last_billable_date_inclusive_public_holiday",
         ),
     ],
     indirect=["toggl_tally_object"],
@@ -124,6 +145,15 @@ def test_toggl_tally_last_billable_date(
             ),
             18,
             id="remaining_working_days_case_2",
+        ),
+        pytest.param(
+            dict(
+                now=datetime(2023, 3, 1),
+                invoice_day_of_month=26,
+                exclude_public_holidays=True,
+            ),
+            17,
+            id="remaining_working_days_case_2_public_holiday",
         ),
     ],
     indirect=["toggl_tally_object"],
