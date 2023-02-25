@@ -13,7 +13,7 @@ def get_current_timestamp(local_timezone: Union[str, None] = None) -> str:
     """
     RFC3339 format https://developers.track.toggl.com/docs/api/time_entries
 
-    >>> get_current_timestamp(local_timezone="SAST")[-6:]
+    >>> get_current_timestamp(local_timezone="Africa/Johannesburg")[-6:]
     '+02:00'
     """
     local_time = get_current_datetime(local_timezone)
