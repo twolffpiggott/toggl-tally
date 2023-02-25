@@ -2,5 +2,5 @@ import click
 
 
 @click.group()
-def fna_parser():
+def toggl_tally():
     pass

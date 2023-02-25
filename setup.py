@@ -12,6 +12,6 @@ setup(
     ],
     entry_points="""
             [console_scripts]
-            toggl-tally=toggl_tally.cli:fna_parser
+            toggl-tally=toggl_tally.cli:toggl_tally
         """,
 )
