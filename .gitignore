@@ -15,7 +15,8 @@ __pycache__
 *.tsv
 
 # python
-__pycache__/
+**/__pycache__
+**/*.pyc
 *.py[cod]
 *$py.class
 
