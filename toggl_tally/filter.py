@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass, field
-from typing import List, NamedTuple, Tuple
+from typing import List, NamedTuple
 
 from toggl_tally import TogglAPI
 
@@ -38,20 +38,43 @@ class TogglFilter(object):
         self.filtered_projects: TogglEntities = self._filter_projects(projects)
         self.filtered_clients: TogglEntities = self._filter_clients(clients)
         self.filtered_workspaces: TogglEntities = self._filter_workspaces(workspaces)
-        (
-            self.filtered_client_projects,
-            self.filtered_workspace_projects,
-        ) = self._filter_client_and_workspace_projects()
+        self.filtered_client_projects = self._filter_client_and_workspace_projects()
 
-    def filter_time_entries(self, response: List[dict]):
-        # can only filter time entries directly by project and workspace ID
-        # must filter by client by excluding non-client projects
-        # complications: caller could provide incompatible workspaces and clients
-        # answer: then give them an empty result!
-        # easiest path: filter only by projects
-        # maintain a set of project IDs
+    def filter_time_entries(self, response: List[dict]) -> List[dict]:
+        """
+        Time entries always have a workspace
+        Time entries may have a project
+        Time entries only have clients by way of projects
+        Projects can have no client
+
+        Caller provides incompatible workspaces and clients -> empty result
+        """
+        filter_by_workspace = bool(self.filtered_workspaces)
+        if filter_by_workspace:
+            workspace_ids_set = set(self.filtered_workspaces.entity_ids)
+        filter_by_project = bool(self.filtered_projects) or bool(
+            self.filtered_client_projects
+        )
+        project_id_sets = []
+        if self.filtered_projects:
+            project_id_sets.append(set(self.filtered_projects.entity_ids))
+        if self.filtered_clients:
+            project_id_sets.append(set(self.filtered_client_projects.entity_ids))
+        project_ids_intersection = project_id_sets[0]
+        for project_id_set in project_id_sets[1:]:
+            project_ids_intersection = project_ids_intersection & project_id_set
+        filtered_time_entries = []
         for time_entry in response:
-            pass
+            include_time_entry = True
+            if filter_by_workspace:
+                if time_entry["workspace_id"] not in workspace_ids_set:
+                    include_time_entry = False
+            if filter_by_project:
+                if time_entry["project_id"] not in project_ids_intersection:
+                    include_time_entry = False
+            if include_time_entry:
+                filtered_time_entries.append(time_entry)
+        return filtered_time_entries
 
     @staticmethod
     def get_toggl_entities(
@@ -80,11 +103,13 @@ class TogglFilter(object):
             )
         return TogglEntities(entities)
 
-    def _filter_client_and_workspace_projects(
+    def _filter_client_projects(
         self,
-    ) -> Tuple[TogglEntities, TogglEntities]:
+    ) -> TogglEntities:
+        """
+        Time entries are only associated with clients by way of projects.
+        """
         client_projects_entities = []
-        workspace_projects_entities = []
         for project_dict in self.user_projects:
             if project_dict["client_id"] in self.filtered_clients.entity_ids:
                 client_projects_entities.append(
@@ -92,15 +117,7 @@ class TogglFilter(object):
                         id=project_dict["id"], name=project_dict["name"], type="project"
                     )
                 )
-            if project_dict["workspace_id"] in self.filtered_workspaces.entity_ids:
-                workspace_projects_entities.append(
-                    TogglEntity(
-                        id=project_dict["id"], name=project_dict["name"], type="project"
-                    )
-                )
-        return TogglEntities(client_projects_entities), TogglEntities(
-            workspace_projects_entities
-        )
+        return TogglEntities(client_projects_entities)
 
     def _filter_projects(self, project_names: List[str]) -> TogglEntities:
         return self.get_toggl_entities(
