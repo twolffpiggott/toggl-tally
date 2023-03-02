@@ -52,9 +52,7 @@ class TogglFilter(object):
         filter_by_workspace = bool(self.filtered_workspaces)
         if filter_by_workspace:
             workspace_ids_set = set(self.filtered_workspaces.entity_ids)
-        filter_by_project = bool(self.filtered_projects) or bool(
-            self.filtered_client_projects
-        )
+        filter_by_project = bool(self.filtered_projects) or bool(self.filtered_clients)
         project_id_sets = []
         if self.filtered_projects:
             project_id_sets.append(set(self.filtered_projects.entity_ids))
