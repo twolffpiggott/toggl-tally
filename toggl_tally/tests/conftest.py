@@ -18,3 +18,70 @@ def toggl_tally_object(request):
             exclude_public_holidays=kwargs.get("exclude_public_holidays", True),
         )
         yield tally_object
+
+
+@pytest.fixture()
+def user_workspaces():
+    return [
+        {"name": "John Doe's workspace", "id": 10},
+        {"name": "Alternate workspace", "id": 11},
+    ]
+
+
+@pytest.fixture()
+def user_clients():
+    return [
+        {"name": "Supercorp", "id": 55, "wid": 10},
+        {"name": "Another client", "id": 20, "wid": 10},
+        {"name": "Hypermart", "id": 40, "wid": 11},
+    ]
+
+
+@pytest.fixture()
+def user_projects():
+    return [
+        {"name": "Doohickey design", "id": 1000, "workspace_id": 10, "client_id": 55},
+        {"name": "Course work", "id": 1030, "workspace_id": 10, "client_id": None},
+        {"name": "Project X", "id": 1001, "workspace_id": 11, "client_id": 40},
+    ]
+
+
+@pytest.fixture()
+def time_entries():
+    return [
+        {
+            "id": 1000001,
+            "workspace_id": 10,
+            "project_id": 1000,
+            "duration": 3600,
+            "description": "Design part 1",
+        },
+        {
+            "id": 1000002,
+            "workspace_id": 10,
+            "project_id": 1000,
+            "duration": 3600,
+            "description": "Design part 2",
+        },
+        {
+            "id": 1000003,
+            "workspace_id": 10,
+            "project_id": 1000,
+            "duration": 3600,
+            "description": "Design part 3",
+        },
+        {
+            "id": 1000010,
+            "workspace_id": 10,
+            "project_id": 1030,
+            "duration": 1800,
+            "description": "Module 5",
+        },
+        {
+            "id": 1000012,
+            "workspace_id": 11,
+            "project_id": 1001,
+            "duration": 1800,
+            "description": "Phase 2 ideation",
+        },
+    ]
