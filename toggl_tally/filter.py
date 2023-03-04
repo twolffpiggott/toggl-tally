@@ -38,7 +38,7 @@ class TogglFilter(object):
         self.filtered_projects: TogglEntities = self._filter_projects(projects)
         self.filtered_clients: TogglEntities = self._filter_clients(clients)
         self.filtered_workspaces: TogglEntities = self._filter_workspaces(workspaces)
-        self.filtered_client_projects = self._filter_client_and_workspace_projects()
+        self.filtered_client_projects = self._filter_client_projects()
 
     def filter_time_entries(self, response: List[dict]) -> List[dict]:
         """
@@ -97,7 +97,7 @@ class TogglFilter(object):
                     f" user {TOGGL_ENTITIES}s"
                 )
             entities.append(
-                TogglEntity(id=entity_id, name=entity_name, type=entity_name)
+                TogglEntity(id=entity_id, name=entity_name, type=toggl_entity)
             )
         return TogglEntities(entities)
 
@@ -120,20 +120,20 @@ class TogglFilter(object):
     def _filter_projects(self, project_names: List[str]) -> TogglEntities:
         return self.get_toggl_entities(
             response=self.user_projects,
-            toggle_entity="project",
+            toggl_entity="project",
             entity_names=project_names,
         )
 
     def _filter_clients(self, client_names: List[str]) -> TogglEntities:
         return self.get_toggl_entities(
             response=self.user_clients,
-            toggle_entity="client",
+            toggl_entity="client",
             entity_names=client_names,
         )
 
     def _filter_workspaces(self, workspace_names: List[str]) -> TogglEntities:
         return self.get_toggl_entities(
             response=self.user_workspaces,
-            toggle_entity="workspace",
+            toggl_entity="workspace",
             entity_names=workspace_names,
         )

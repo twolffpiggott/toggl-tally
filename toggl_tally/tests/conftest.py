@@ -2,14 +2,14 @@ from unittest.mock import PropertyMock, patch
 
 import pytest
 
-from toggl_tally.tally import TogglTally
+from toggl_tally import TogglFilter, TogglTally
 
 
 @pytest.fixture()
 def toggl_tally_object(request):
     kwargs = request.param
     with patch(
-        "toggl_tally.tally.TogglTally.now", new_callable=PropertyMock
+        "toggl_tally.TogglTally.now", new_callable=PropertyMock
     ) as mock_toggl_tally_now:
         mock_toggl_tally_now.return_value = kwargs["now"]
         tally_object = TogglTally(
@@ -18,6 +18,28 @@ def toggl_tally_object(request):
             exclude_public_holidays=kwargs.get("exclude_public_holidays", True),
         )
         yield tally_object
+
+
+@pytest.fixture()
+def toggl_filter_object(request):
+    kwargs = request.param
+    with patch("toggl_tally.TogglAPI") as MockTogglAPI:
+        instance = MockTogglAPI.return_value
+        instance.get_user_projects.return_value = request.getfixturevalue(
+            kwargs["user_projects"]
+        )
+        instance.get_user_clients.return_value = request.getfixturevalue(
+            kwargs["user_clients"]
+        )
+        instance.get_user_workspaces.return_value = request.getfixturevalue(
+            kwargs["user_workspaces"]
+        )
+        yield TogglFilter(
+            api=instance,
+            projects=kwargs["project_names"],
+            clients=kwargs["client_names"],
+            workspaces=kwargs["workspace_names"],
+        )
 
 
 @pytest.fixture()
