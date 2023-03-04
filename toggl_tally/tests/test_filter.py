@@ -1,6 +1,9 @@
+import re
+from unittest.mock import patch
+
 import pytest
 
-from toggl_tally.filter import TogglEntities, TogglEntity
+from toggl_tally.filter import TogglEntities, TogglEntity, TogglFilter
 
 
 @pytest.mark.parametrize(
@@ -64,6 +67,28 @@ def test_get_toggl_entities(
     assert toggl_filter_object.filtered_projects == expected_filtered_projects
     assert toggl_filter_object.filtered_clients == expected_filtered_clients
     assert toggl_filter_object.filtered_workspaces == expected_filtered_workspaces
+
+
+def test_get_toggl_entities_fails_for_missing_name(
+    user_projects,
+    user_clients,
+    user_workspaces,
+):
+    with patch("toggl_tally.TogglAPI") as MockTogglAPI:
+        instance = MockTogglAPI.return_value
+        instance.get_user_projects.return_value = user_projects
+        instance.get_user_clients.return_value = user_clients
+        instance.get_user_workspaces.return_value = user_workspaces
+        exception_match_str = re.escape(
+            "Client name Brawn bazaar not found in user clients"
+        )
+        with pytest.raises(ValueError, match=exception_match_str):
+            TogglFilter(
+                api=instance,
+                projects=[],
+                clients=["Brawn bazaar"],
+                workspaces=[],
+            )
 
 
 @pytest.mark.parametrize(

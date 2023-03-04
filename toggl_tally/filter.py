@@ -94,7 +94,7 @@ class TogglFilter(object):
             except KeyError:
                 raise ValueError(
                     f"{toggl_entity.title()} name {entity_name} not found in"
-                    f" user {TOGGL_ENTITIES}s"
+                    f" user {toggl_entity}s"
                 )
             entities.append(
                 TogglEntity(id=entity_id, name=entity_name, type=toggl_entity)
