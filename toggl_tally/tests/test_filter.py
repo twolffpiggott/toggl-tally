@@ -31,7 +31,26 @@ from toggl_tally.filter import TogglEntities, TogglEntity
                     TogglEntity(id=10, name="John Doe's workspace", type="workspace"),
                 ]
             ),
-            id="base_case",
+            id="get_toggl_entities_base",
+        ),
+        pytest.param(
+            dict(
+                user_projects="user_projects",
+                user_clients="user_clients",
+                user_workspaces="user_workspaces",
+                project_names=["Doohickey design", "Project X"],
+                client_names=[],
+                workspace_names=[],
+            ),
+            TogglEntities(
+                entities=[
+                    TogglEntity(id=1000, name="Doohickey design", type="project"),
+                    TogglEntity(id=1001, name="Project X", type="project"),
+                ]
+            ),
+            TogglEntities(entities=[]),
+            TogglEntities(entities=[]),
+            id="get_toggl_entities_empty",
         ),
     ],
     indirect=["toggl_filter_object"],
