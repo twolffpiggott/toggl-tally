@@ -63,6 +63,7 @@ def user_clients():
 def user_projects():
     return [
         {"name": "Doohickey design", "id": 1000, "workspace_id": 10, "client_id": 55},
+        {"name": "Foo implementation", "id": 1002, "workspace_id": 10, "client_id": 55},
         {"name": "Course work", "id": 1030, "workspace_id": 10, "client_id": None},
         {"name": "Project X", "id": 1001, "workspace_id": 11, "client_id": 40},
     ]
