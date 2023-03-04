@@ -64,6 +64,7 @@ def user_projects():
     return [
         {"name": "Doohickey design", "id": 1000, "workspace_id": 10, "client_id": 55},
         {"name": "Foo implementation", "id": 1002, "workspace_id": 10, "client_id": 55},
+        {"name": "Bar implementation", "id": 1003, "workspace_id": 10, "client_id": 55},
         {"name": "Course work", "id": 1030, "workspace_id": 10, "client_id": None},
         {"name": "Project X", "id": 1001, "workspace_id": 11, "client_id": 40},
     ]
@@ -106,5 +107,26 @@ def time_entries():
             "project_id": 1001,
             "duration": 1800,
             "description": "Phase 2 ideation",
+        },
+        {
+            "id": 1000020,
+            "workspace_id": 10,
+            "project_id": 1030,
+            "duration": 1600,
+            "description": "Module 6",
+        },
+        {
+            "id": 1000031,
+            "workspace_id": 10,
+            "project_id": 1002,
+            "duration": 3600,
+            "description": "Widget building",
+        },
+        {
+            "id": 1000032,
+            "workspace_id": 10,
+            "project_id": 1003,
+            "duration": 1900,
+            "description": "Brainstorm session",
         },
     ]

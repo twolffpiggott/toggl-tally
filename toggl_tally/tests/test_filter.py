@@ -107,6 +107,7 @@ def test_get_toggl_entities_fails_for_missing_name(
                 entities=[
                     TogglEntity(id=1000, name="Doohickey design", type="project"),
                     TogglEntity(id=1002, name="Foo implementation", type="project"),
+                    TogglEntity(id=1003, name="Bar implementation", type="project"),
                 ]
             ),
             id="filter_client_projects",
@@ -134,3 +135,103 @@ def test_filter_client_projects(
         toggl_filter_object.filtered_client_projects
         == expected_filtered_client_projects
     )
+
+
+@pytest.mark.parametrize(
+    "toggl_filter_object,expected_filtered_time_entries_indices",
+    [
+        pytest.param(
+            dict(
+                user_projects="user_projects",
+                user_clients="user_clients",
+                user_workspaces="user_workspaces",
+                project_names=[],
+                client_names=["Supercorp"],
+                workspace_names=[],
+            ),
+            [0, 1, 2, 6, 7],
+            id="filter_time_entries_by_client",
+        ),
+        pytest.param(
+            dict(
+                user_projects="user_projects",
+                user_clients="user_clients",
+                user_workspaces="user_workspaces",
+                project_names=[],
+                client_names=[],
+                workspace_names=["Alternate workspace"],
+            ),
+            [4],
+            id="filter_time_entries_by_workspace",
+        ),
+        pytest.param(
+            dict(
+                user_projects="user_projects",
+                user_clients="user_clients",
+                user_workspaces="user_workspaces",
+                project_names=["Course work"],
+                client_names=[],
+                workspace_names=[],
+            ),
+            [3, 5],
+            id="filter_time_entries_by_project",
+        ),
+        pytest.param(
+            dict(
+                user_projects="user_projects",
+                user_clients="user_clients",
+                user_workspaces="user_workspaces",
+                project_names=["Doohickey design"],
+                client_names=["Supercorp"],
+                workspace_names=["John Doe's workspace"],
+            ),
+            [0, 1, 2],
+            id="filter_time_entries_by_project_client_and_workspace",
+        ),
+        pytest.param(
+            dict(
+                user_projects="user_projects",
+                user_clients="user_clients",
+                user_workspaces="user_workspaces",
+                project_names=["Doohickey design"],
+                client_names=["Hypermart"],
+                workspace_names=["John Doe's workspace"],
+            ),
+            [],
+            id="filter_time_entries_by_project_client_and_workspace_mismatched_1",
+        ),
+        pytest.param(
+            dict(
+                user_projects="user_projects",
+                user_clients="user_clients",
+                user_workspaces="user_workspaces",
+                project_names=["Doohickey design"],
+                client_names=["Supercorp"],
+                workspace_names=["Alternate workspace"],
+            ),
+            [],
+            id="filter_time_entries_by_project_client_and_workspace_mismatched_2",
+        ),
+        pytest.param(
+            dict(
+                user_projects="user_projects",
+                user_clients="user_clients",
+                user_workspaces="user_workspaces",
+                project_names=["Doohickey design", "Foo implementation"],
+                client_names=["Supercorp"],
+                workspace_names=[],
+            ),
+            [0, 1, 2, 6],
+            id="filter_time_entries_by_project_multiple",
+        ),
+    ],
+    indirect=["toggl_filter_object"],
+)
+def test_filter_time_entries(
+    toggl_filter_object, expected_filtered_time_entries_indices, time_entries
+):
+    expected_filtered_time_entries = [
+        time_entries[index] for index in expected_filtered_time_entries_indices
+    ]
+    filtered_time_entries = toggl_filter_object.filter_time_entries(time_entries)
+    assert filtered_time_entries == expected_filtered_time_entries

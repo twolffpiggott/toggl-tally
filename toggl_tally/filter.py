@@ -53,14 +53,15 @@ class TogglFilter(object):
         if filter_by_workspace:
             workspace_ids_set = set(self.filtered_workspaces.entity_ids)
         filter_by_project = bool(self.filtered_projects) or bool(self.filtered_clients)
-        project_id_sets = []
-        if self.filtered_projects:
-            project_id_sets.append(set(self.filtered_projects.entity_ids))
-        if self.filtered_clients:
-            project_id_sets.append(set(self.filtered_client_projects.entity_ids))
-        project_ids_intersection = project_id_sets[0]
-        for project_id_set in project_id_sets[1:]:
-            project_ids_intersection = project_ids_intersection & project_id_set
+        if filter_by_project:
+            project_id_sets = []
+            if self.filtered_projects:
+                project_id_sets.append(set(self.filtered_projects.entity_ids))
+            if self.filtered_clients:
+                project_id_sets.append(set(self.filtered_client_projects.entity_ids))
+            project_ids_intersection = project_id_sets[0]
+            for project_id_set in project_id_sets[1:]:
+                project_ids_intersection = project_ids_intersection & project_id_set
         filtered_time_entries = []
         for time_entry in response:
             include_time_entry = True
