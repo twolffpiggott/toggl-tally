@@ -8,6 +8,7 @@ setup(
         "click==8.1.3",
         "holidays==0.19",
         "pytest==7.2.1",
+        "pyyaml==6.0",
         "requests==2.28.2",
     ],
     entry_points="""

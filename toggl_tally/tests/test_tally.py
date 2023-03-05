@@ -155,6 +155,15 @@ def test_toggl_tally_last_billable_date(
             17,
             id="remaining_working_days_case_2_public_holiday",
         ),
+        pytest.param(
+            dict(
+                now=datetime(2023, 3, 1, 14, 45, 40),
+                invoice_day_of_month=26,
+                exclude_public_holidays=False,
+            ),
+            18,
+            id="remaining_working_days_case_2_time_info",
+        ),
     ],
     indirect=["toggl_tally_object"],
 )

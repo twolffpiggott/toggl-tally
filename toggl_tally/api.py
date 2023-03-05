@@ -28,7 +28,7 @@ class TogglAPI(object):
         self.session.auth = (api_token, "api_token")
 
     def get_time_entries_between(self, start_date: datetime, end_date: datetime):
-        params = dict(start_date=start_date, end_date=end_date)
+        params = dict(start_date=start_date.isoformat(), end_date=end_date.isoformat())
         return self._call_toggl_api(f"{self.base_url}/me/time_entries", params=params)
 
     def get_time_entries_to_date(self):

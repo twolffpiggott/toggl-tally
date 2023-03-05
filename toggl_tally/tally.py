@@ -1,5 +1,5 @@
 from calendar import monthrange
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Union
 
 import holidays
@@ -51,14 +51,20 @@ class TogglTally(object):
     @property
     def current_month_invoice_date(self):
         return self.calculate_invoice_date(
-            self.invoice_day_of_month, self.now.month, self.now.year
+            self.invoice_day_of_month,
+            self.now.month,
+            self.now.year,
+            tzinfo=self.now.tzinfo,
         )
 
     @property
     def last_invoice_date(self):
         if self.now < self.current_month_invoice_date:
             return self.calculate_invoice_date(
-                self.invoice_day_of_month, self.now.month - 1, self.now.year
+                self.invoice_day_of_month,
+                self.now.month - 1,
+                self.now.year,
+                tzinfo=self.now.tzinfo,
             )
         else:
             return self.current_month_invoice_date
@@ -69,7 +75,10 @@ class TogglTally(object):
             return self.current_month_invoice_date
         else:
             return self.calculate_invoice_date(
-                self.invoice_day_of_month, self.now.month + 1, self.now.year
+                self.invoice_day_of_month,
+                self.now.month + 1,
+                self.now.year,
+                tzinfo=self.now.tzinfo,
             )
 
     @property
@@ -132,13 +141,23 @@ class TogglTally(object):
                 shifted_date += timedelta(days=1)
         return shifted_date
 
-    def calculate_invoice_date(self, invoice_day_of_month: int, month: int, year: int):
+    def calculate_invoice_date(
+        self,
+        invoice_day_of_month: int,
+        month: int,
+        year: int,
+        tzinfo: Union[timezone, None],
+    ):
         try:
-            invoice_date = datetime(day=invoice_day_of_month, month=month, year=year)
+            invoice_date = datetime(
+                day=invoice_day_of_month, month=month, year=year, tzinfo=tzinfo
+            )
         except ValueError:
             # assume the invoice day falls after the last day of the month
             last_day_of_month = monthrange(year, month)[1]
-            invoice_date = datetime(day=last_day_of_month, month=month, year=year)
+            invoice_date = datetime(
+                day=last_day_of_month, month=month, year=year, tzinfo=tzinfo
+            )
         # return invoice date or last week day before invoice date
         return self.get_last_weekday_inclusive(invoice_date)
 
