@@ -4,6 +4,7 @@ from typing import List
 import click
 import yaml
 from rich.console import Console
+from rich.progress import BarColumn, Progress, TaskProgressColumn, TextColumn
 
 from toggl_tally import TogglAPI, TogglFilter, TogglTally
 
@@ -112,6 +113,14 @@ def hours(
         " hours worked since last invoice "
         f"across:{context_str}"
     )
+    with Progress(
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TaskProgressColumn(),
+    ) as progress:
+        progress.add_task(
+            "[green]Progress for month", completed=seconds_worked, total=target_seconds
+        )
 
 
 def format_seconds(seconds: float) -> str:
