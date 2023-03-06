@@ -96,7 +96,7 @@ def hours(
     str_hours = format_seconds(seconds_outstanding / tally.remaining_working_days)
     console.print(
         f"[bold blue]{tally.remaining_working_days}[/bold blue]"
-        " days remaining before next invoice on"
+        " days to go before next invoice on"
         f" [bold cyan]{tally.next_invoice_date.strftime('%d %b')}[/bold cyan]."
     )
     console.print(
