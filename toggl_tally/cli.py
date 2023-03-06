@@ -51,6 +51,13 @@ def _comma_separated_arg_split(ctx, param, value):
     callback=_comma_separated_arg_split,
     help="Comma-separated list of projects",
 )
+@click.option(
+    "--skip-today",
+    is_flag=True,
+    show_default=True,
+    default=False,
+    help="Exclude today from remaining working days for the month",
+)
 @click.pass_context
 def hours(
     ctx: click.Context,
@@ -59,9 +66,10 @@ def hours(
     workspaces: List[str],
     clients: List[str],
     projects: List[str],
+    skip_today: bool,
 ):
     api = TogglAPI()
-    tally = TogglTally(invoice_day_of_month=invoice_day)
+    tally = TogglTally(invoice_day_of_month=invoice_day, skip_today=skip_today)
     filter = TogglFilter(
         api=api,
         projects=projects,
