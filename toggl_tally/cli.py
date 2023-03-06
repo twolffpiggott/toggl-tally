@@ -1,4 +1,3 @@
-import datetime
 from pathlib import Path
 from typing import List
 
@@ -77,7 +76,7 @@ def hours(
     seconds_worked = sum(entry["duration"] for entry in filtered_time_entries)
     target_seconds = hours_per_month * 60 * 60
     seconds_outstanding = max(target_seconds - seconds_worked, 0)
-    str_hours = float_seconds_to_str(seconds_outstanding / tally.remaining_working_days)
+    str_hours = format_seconds(seconds_outstanding / tally.remaining_working_days)
     click.echo(
         f"{tally.remaining_working_days} days remaining before next invoice on"
         f" {tally.next_invoice_date.strftime('%d %b')}"
@@ -86,7 +85,17 @@ def hours(
         f"Work {str_hours} per day to hit your target of {hours_per_month} hours"
         f" by last billable workday {tally.last_billable_date.strftime('%d %b')}"
     )
+    workspaces_str = f"\nworkspaces: {', '.join(workspaces)}" if workspaces else ""
+    clients_str = f"\nclients: {', '.join(clients)}" if clients else ""
+    projects_str = f"\nprojects: {', '.join(projects)}" if projects else ""
+    context_str = workspaces_str + clients_str + projects_str
+    click.echo(
+        f"{format_seconds(seconds_worked)} hours worked since last invoice "
+        f"across:{context_str}"
+    )
 
 
-def float_seconds_to_str(seconds: float) -> str:
-    return str(datetime.timedelta(seconds=seconds)).rsplit(".", 1)[0]
+def format_seconds(seconds: float) -> str:
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    return f"{hours:02.0f}:{minutes:02.0f}:{seconds:02.0f}"
