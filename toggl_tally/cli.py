@@ -5,6 +5,7 @@ import click
 import yaml
 from rich.console import Console
 from rich.progress import BarColumn, Progress, TaskProgressColumn, TextColumn
+from rich.table import Table
 
 from toggl_tally import TogglAPI, TogglFilter, TogglTally
 
@@ -96,22 +97,17 @@ def hours(
     console.print(
         f"[bold blue]{tally.remaining_working_days}[/bold blue]"
         " days remaining before next invoice on"
-        f" [bold cyan]{tally.next_invoice_date.strftime('%d %b')}[/bold cyan]"
+        f" [bold cyan]{tally.next_invoice_date.strftime('%d %b')}[/bold cyan]."
     )
     console.print(
         f"Work [bold dark_cyan]{str_hours}[/bold dark_cyan] per day to hit your target"
         f" of [bold orange1]{hours_per_month}[/bold orange1] hours"
         " by last billable workday"
-        f" [bold cyan]{tally.last_billable_date.strftime('%d %b')}[/bold cyan]"
+        f" [bold cyan]{tally.last_billable_date.strftime('%d %b')}[/bold cyan]."
     )
-    workspaces_str = f"\nworkspaces: {', '.join(workspaces)}" if workspaces else ""
-    clients_str = f"\nclients: {', '.join(clients)}" if clients else ""
-    projects_str = f"\nprojects: {', '.join(projects)}" if projects else ""
-    context_str = workspaces_str + clients_str + projects_str
     console.print(
         f"[bold dark_cyan]{format_seconds(seconds_worked)}[/bold dark_cyan]"
-        " hours worked since last invoice "
-        f"across:{context_str}"
+        " hours worked since last invoice."
     )
     with Progress(
         TextColumn("[progress.description]{task.description}"),
@@ -121,6 +117,16 @@ def hours(
         progress.add_task(
             "[green]Progress for month", completed=seconds_worked, total=target_seconds
         )
+    table = Table(title="Filters")
+    table.add_column("Type", justify="right", style="cyan", no_wrap=True)
+    table.add_column("Name", style="magenta")
+    for workspace_name in workspaces:
+        table.add_row("Workspace", workspace_name)
+    for client_name in clients:
+        table.add_row("Client", client_name)
+    for project_name in projects:
+        table.add_row("Project", project_name)
+    console.print(table)
 
 
 def format_seconds(seconds: float) -> str:
