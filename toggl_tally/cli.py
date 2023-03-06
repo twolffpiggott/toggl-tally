@@ -3,6 +3,7 @@ from typing import List
 
 import click
 import yaml
+from rich.console import Console
 
 from toggl_tally import TogglAPI, TogglFilter, TogglTally
 
@@ -68,37 +69,47 @@ def hours(
     projects: List[str],
     skip_today: bool,
 ):
+    console = Console()
     api = TogglAPI()
     tally = TogglTally(invoice_day_of_month=invoice_day, skip_today=skip_today)
-    filter = TogglFilter(
-        api=api,
-        projects=projects,
-        clients=clients,
-        workspaces=workspaces,
-    )
-    unfiltered_time_entries = api.get_time_entries_between(
-        start_date=tally.last_invoice_date,
-        end_date=tally.now,
-    )
+    with console.status("[bold dark_cyan]Getting clients, projects and workspaces"):
+        filter = TogglFilter(
+            api=api,
+            projects=projects,
+            clients=clients,
+            workspaces=workspaces,
+        )
+    with console.status("[bold dark_cyan]Getting time entries"):
+        unfiltered_time_entries = api.get_time_entries_between(
+            start_date=tally.last_invoice_date,
+            end_date=tally.now,
+        )
     filtered_time_entries = filter.filter_time_entries(response=unfiltered_time_entries)
-    seconds_worked = sum(entry["duration"] for entry in filtered_time_entries)
+    # exclude running entries
+    seconds_worked = sum(
+        entry["duration"] for entry in filtered_time_entries if entry["duration"] > 0
+    )
     target_seconds = hours_per_month * 60 * 60
     seconds_outstanding = max(target_seconds - seconds_worked, 0)
     str_hours = format_seconds(seconds_outstanding / tally.remaining_working_days)
-    click.echo(
-        f"{tally.remaining_working_days} days remaining before next invoice on"
-        f" {tally.next_invoice_date.strftime('%d %b')}"
+    console.print(
+        f"[bold blue]{tally.remaining_working_days}[/bold blue]"
+        " days remaining before next invoice on"
+        f" [bold cyan]{tally.next_invoice_date.strftime('%d %b')}[/bold cyan]"
     )
-    click.echo(
-        f"Work {str_hours} per day to hit your target of {hours_per_month} hours"
-        f" by last billable workday {tally.last_billable_date.strftime('%d %b')}"
+    console.print(
+        f"Work [bold dark_cyan]{str_hours}[/bold dark_cyan] per day to hit your target"
+        f" of [bold orange1]{hours_per_month}[/bold orange1] hours"
+        " by last billable workday"
+        f" [bold cyan]{tally.last_billable_date.strftime('%d %b')}[/bold cyan]"
     )
     workspaces_str = f"\nworkspaces: {', '.join(workspaces)}" if workspaces else ""
     clients_str = f"\nclients: {', '.join(clients)}" if clients else ""
     projects_str = f"\nprojects: {', '.join(projects)}" if projects else ""
     context_str = workspaces_str + clients_str + projects_str
-    click.echo(
-        f"{format_seconds(seconds_worked)} hours worked since last invoice "
+    console.print(
+        f"[bold dark_cyan]{format_seconds(seconds_worked)}[/bold dark_cyan]"
+        " hours worked since last invoice "
         f"across:{context_str}"
     )
 

@@ -10,6 +10,7 @@ setup(
         "pytest==7.2.1",
         "pyyaml==6.0",
         "requests==2.28.2",
+        "rich==13.3.2",
     ],
     entry_points="""
             [console_scripts]
