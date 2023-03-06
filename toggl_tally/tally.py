@@ -43,7 +43,10 @@ class TogglTally(object):
 
     @property
     def next_working_day(self):
-        next_working_day = self.now
+        now = self.now
+        next_working_day = datetime(
+            day=now.day, month=now.month, year=now.year, tzinfo=now.tzinfo
+        )
         if self.skip_today:
             next_working_day += timedelta(days=1)
         return self.get_next_workday_inclusive(next_working_day)

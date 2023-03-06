@@ -22,9 +22,6 @@ def toggl_tally(ctx: click.Context, config: Path):
 def _comma_separated_arg_split(ctx, param, value):
     if value is None:
         return []
-    # if value is derived from yaml config
-    if isinstance(value, list):
-        return value
     options = [option.strip() for option in value.split(",")]
     return options
 
