@@ -1,6 +1,6 @@
 from calendar import monthrange
-from datetime import datetime, timedelta, timezone
-from typing import List, Union
+from datetime import date, datetime, timedelta, timezone
+from typing import List, Tuple, Union
 
 import holidays
 from dateutil import rrule, tz
@@ -38,11 +38,11 @@ class TogglTally(object):
         self.exclude_public_holidays = exclude_public_holidays
 
     @property
-    def now(self):
+    def now(self) -> datetime:
         return get_current_datetime(self.timezone)
 
     @property
-    def next_working_day(self):
+    def next_working_day(self) -> datetime:
         now = self.now
         next_working_day = datetime(
             day=now.day, month=now.month, year=now.year, tzinfo=now.tzinfo
@@ -52,7 +52,7 @@ class TogglTally(object):
         return self.get_next_workday_inclusive(next_working_day)
 
     @property
-    def current_month_invoice_date(self):
+    def current_month_invoice_date(self) -> datetime:
         return self.calculate_invoice_date(
             self.invoice_day_of_month,
             self.now.month,
@@ -61,7 +61,7 @@ class TogglTally(object):
         )
 
     @property
-    def last_invoice_date(self):
+    def last_invoice_date(self) -> datetime:
         if self.now < self.current_month_invoice_date:
             return self.calculate_invoice_date(
                 self.invoice_day_of_month,
@@ -73,7 +73,7 @@ class TogglTally(object):
             return self.current_month_invoice_date
 
     @property
-    def next_invoice_date(self):
+    def next_invoice_date(self) -> datetime:
         if self.now < self.current_month_invoice_date:
             return self.current_month_invoice_date
         else:
@@ -85,7 +85,7 @@ class TogglTally(object):
             )
 
     @property
-    def last_billable_date(self):
+    def last_billable_date(self) -> datetime:
         # should be inclusive if the next invoice date is before the strict invoice date
         # i.e. you likely want to bill including this day
         if self.next_invoice_date.day < self.invoice_day_of_month:
@@ -95,8 +95,8 @@ class TogglTally(object):
         )
 
     @property
-    def remaining_working_days(self):
-        days = list(
+    def _remaining_working_days(self) -> List[datetime]:
+        return list(
             rrule.rrule(
                 freq=rrule.DAILY,
                 dtstart=self.next_working_day,
@@ -104,11 +104,24 @@ class TogglTally(object):
                 byweekday=self.working_days,
             )
         )
-        if self.exclude_public_holidays:
-            return len([day for day in days if day not in self.public_holidays])
-        return len(days)
 
-    def get_last_weekday_inclusive(self, date: datetime):
+    @property
+    def remaining_working_days(self) -> int:
+        working_days = self._remaining_working_days
+        if self.exclude_public_holidays:
+            return len([day for day in working_days if day not in self.public_holidays])
+        return len(working_days)
+
+    @property
+    def remaining_public_holidays(self) -> List[Tuple[str, date]]:
+        working_dates = [day.date() for day in self._remaining_working_days]
+        holiday_tuples = []
+        for holiday_date, holiday_name in self.public_holidays.items():
+            if holiday_date in working_dates:
+                holiday_tuples.append((holiday_name, holiday_date))
+        return holiday_tuples
+
+    def get_last_weekday_inclusive(self, date: datetime) -> datetime:
         shifted_date = date
         if self.exclude_public_holidays:
             while shifted_date.weekday() > 4 or shifted_date in self.public_holidays:
@@ -118,7 +131,7 @@ class TogglTally(object):
                 shifted_date -= timedelta(days=1)
         return shifted_date
 
-    def get_last_workday_inclusive(self, date: datetime):
+    def get_last_workday_inclusive(self, date: datetime) -> datetime:
         shifted_date = date
         if self.exclude_public_holidays:
             while (
@@ -131,7 +144,7 @@ class TogglTally(object):
                 shifted_date -= timedelta(days=1)
         return shifted_date
 
-    def get_next_workday_inclusive(self, date: datetime):
+    def get_next_workday_inclusive(self, date: datetime) -> datetime:
         shifted_date = date
         if self.exclude_public_holidays:
             while (
@@ -150,7 +163,7 @@ class TogglTally(object):
         month: int,
         year: int,
         tzinfo: Union[timezone, None],
-    ):
+    ) -> datetime:
         try:
             invoice_date = datetime(
                 day=invoice_day_of_month, month=month, year=year, tzinfo=tzinfo

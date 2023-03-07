@@ -102,7 +102,7 @@ def hours(
     console.print(
         f"Work [bold dark_cyan]{str_hours}[/bold dark_cyan] per day to hit your target"
         f" of [bold orange1]{hours_per_month}[/bold orange1] hours"
-        " by last billable workday"
+        " on last billable workday"
         f" [bold cyan]{tally.last_billable_date.strftime('%d %b')}[/bold cyan]."
     )
     console.print(

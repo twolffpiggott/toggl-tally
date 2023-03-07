@@ -1,5 +1,5 @@
 import re
-from datetime import datetime
+from datetime import date, datetime
 
 import pytest
 from dateutil import rrule
@@ -171,6 +171,30 @@ def test_toggl_tally_remaining_working_days(
     toggl_tally_object, expected_remaining_working_days
 ):
     assert toggl_tally_object.remaining_working_days == expected_remaining_working_days
+
+
+@pytest.mark.parametrize(
+    "toggl_tally_object,expected_remaining_public_holidays",
+    [
+        pytest.param(
+            dict(
+                now=datetime(2023, 3, 1),
+                invoice_day_of_month=31,
+                exclude_public_holidays=True,
+            ),
+            [("Human Rights Day", date(2023, 3, 21))],
+            id="remaining_public_holidays",
+        )
+    ],
+    indirect=["toggl_tally_object"],
+)
+def test_toggl_tally_remaining_public_holidays(
+    toggl_tally_object, expected_remaining_public_holidays
+):
+    assert (
+        toggl_tally_object.remaining_public_holidays
+        == expected_remaining_public_holidays
+    )
 
 
 def test_toggle_tally_rrule_day_strs():
