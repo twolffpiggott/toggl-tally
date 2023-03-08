@@ -7,7 +7,8 @@ from rich.console import Console
 from rich.progress import BarColumn, Progress, TaskProgressColumn, TextColumn
 from rich.table import Table
 
-from toggl_tally import TogglAPI, TogglFilter, TogglTally
+from toggl_tally import RichReport, TogglAPI, TogglFilter, TogglTally
+from toggl_tally.time_utils import format_seconds
 
 
 @click.group()
@@ -94,16 +95,16 @@ def hours(
     target_seconds = hours_per_month * 60 * 60
     seconds_outstanding = max(target_seconds - seconds_worked, 0)
     str_hours = format_seconds(seconds_outstanding / tally.remaining_working_days)
-    console.print(
-        f"[bold blue]{tally.remaining_working_days}[/bold blue]"
-        " days to go before next invoice on"
-        f" [bold cyan]{tally.next_invoice_date.strftime('%d %b')}[/bold cyan]."
+    reporter = RichReport(console)
+    reporter.report_remaining_working_days(
+        remaining_working_days=tally.remaining_working_days,
+        next_invoice_date=tally.next_invoice_date,
     )
     console.print(
         f"Work [bold dark_cyan]{str_hours}[/bold dark_cyan] per day to hit your target"
         f" of [bold orange1]{hours_per_month}[/bold orange1] hours"
         " on last billable workday"
-        f" [bold cyan]{tally.last_billable_date.strftime('%d %b')}[/bold cyan]."
+        f" [bold cyan]{tally.last_billable_date.strftime('%a %d %b')}[/bold cyan]."
     )
     console.print(
         f"[bold dark_cyan]{format_seconds(seconds_worked)}[/bold dark_cyan]"
@@ -127,9 +128,10 @@ def hours(
     for project_name in projects:
         table.add_row("Project", project_name)
     console.print(table)
-
-
-def format_seconds(seconds: float) -> str:
-    hours, seconds = divmod(seconds, 3600)
-    minutes, seconds = divmod(seconds, 60)
-    return f"{hours:02.0f}:{minutes:02.0f}:{seconds:02.0f}"
+    if tally.remaining_public_holidays:
+        table = Table(title="Public holidays")
+        table.add_column("Name", justify="right", style="cyan", no_wrap=True)
+        table.add_column("Date", style="magenta")
+        for holiday in tally.remaining_public_holidays:
+            table.add_row(holiday[0], holiday[1].strftime("%a %d %b"))
+        console.print(table)

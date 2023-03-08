@@ -18,3 +18,15 @@ def get_current_timestamp(local_timezone: Union[str, None] = None) -> str:
     """
     local_time = get_current_datetime(local_timezone)
     return local_time.isoformat()
+
+
+def format_seconds(seconds: float) -> str:
+    """
+    >>> format_seconds(3600)
+    '01:00:00'
+    >>> format_seconds(3662)
+    '01:01:02'
+    """
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    return f"{hours:02.0f}:{minutes:02.0f}:{seconds:02.0f}"
