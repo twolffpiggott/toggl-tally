@@ -4,11 +4,8 @@ from typing import List
 import click
 import yaml
 from rich.console import Console
-from rich.progress import BarColumn, Progress, TaskProgressColumn, TextColumn
-from rich.table import Table
 
 from toggl_tally import RichReport, TogglAPI, TogglFilter, TogglTally
-from toggl_tally.time_utils import format_seconds
 
 
 @click.group()
@@ -94,44 +91,24 @@ def hours(
     )
     target_seconds = hours_per_month * 60 * 60
     seconds_outstanding = max(target_seconds - seconds_worked, 0)
-    str_hours = format_seconds(seconds_outstanding / tally.remaining_working_days)
     reporter = RichReport(console)
     reporter.report_remaining_working_days(
         remaining_working_days=tally.remaining_working_days,
         next_invoice_date=tally.next_invoice_date,
     )
-    console.print(
-        f"Work [bold dark_cyan]{str_hours}[/bold dark_cyan] per day to hit your target"
-        f" of [bold orange1]{hours_per_month}[/bold orange1] hours"
-        " on last billable workday"
-        f" [bold cyan]{tally.last_billable_date.strftime('%a %d %b')}[/bold cyan]."
+    reporter.report_hours_per_day(
+        seconds_per_day=seconds_outstanding / tally.remaining_working_days,
+        hours_per_month=hours_per_month,
+        last_billable_date=tally.last_billable_date,
     )
-    console.print(
-        f"[bold dark_cyan]{format_seconds(seconds_worked)}[/bold dark_cyan]"
-        " hours worked since last invoice."
+    reporter.report_hours_worked(seconds_worked)
+    reporter.month_progress_bar(
+        seconds_worked=seconds_worked, target_seconds=target_seconds
     )
-    with Progress(
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        TaskProgressColumn(),
-    ) as progress:
-        progress.add_task(
-            "[green]Progress for month", completed=seconds_worked, total=target_seconds
-        )
-    table = Table(title="Filters")
-    table.add_column("Type", justify="right", style="cyan", no_wrap=True)
-    table.add_column("Name", style="magenta")
-    for workspace_name in workspaces:
-        table.add_row("Workspace", workspace_name)
-    for client_name in clients:
-        table.add_row("Client", client_name)
-    for project_name in projects:
-        table.add_row("Project", project_name)
-    console.print(table)
+    reporter.filters_table(
+        workspaces=workspaces,
+        clients=clients,
+        projects=projects,
+    )
     if tally.remaining_public_holidays:
-        table = Table(title="Public holidays")
-        table.add_column("Name", justify="right", style="cyan", no_wrap=True)
-        table.add_column("Date", style="magenta")
-        for holiday in tally.remaining_public_holidays:
-            table.add_row(holiday[0], holiday[1].strftime("%a %d %b"))
-        console.print(table)
+        reporter.holidays_table(holidays=tally.remaining_public_holidays)
