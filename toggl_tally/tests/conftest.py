@@ -129,4 +129,11 @@ def time_entries():
             "duration": 1900,
             "description": "Brainstorm session",
         },
+        {
+            "id": 1000032,
+            "workspace_id": 10,
+            "project_id": 1003,
+            "duration": -1678341279,
+            "description": "Brainstorm session",
+        },
     ]

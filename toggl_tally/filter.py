@@ -40,7 +40,9 @@ class TogglFilter(object):
         self.filtered_workspaces: TogglEntities = self._filter_workspaces(workspaces)
         self.filtered_client_projects = self._filter_client_projects()
 
-    def filter_time_entries(self, response: List[dict]) -> List[dict]:
+    def filter_time_entries(
+        self, response: List[dict], exclude_running_entries: bool = True
+    ) -> List[dict]:
         """
         Time entries always have a workspace
         Time entries may have a project
@@ -64,15 +66,18 @@ class TogglFilter(object):
                 project_ids_intersection = project_ids_intersection & project_id_set
         filtered_time_entries = []
         for time_entry in response:
-            include_time_entry = True
+            if exclude_running_entries:
+                # running entries have duration = -1 * (Unix start time)
+                # https://developers.track.toggl.com/docs/api/time_entries
+                if time_entry["duration"] < 0:
+                    continue
             if filter_by_workspace:
                 if time_entry["workspace_id"] not in workspace_ids_set:
-                    include_time_entry = False
+                    continue
             if filter_by_project:
                 if time_entry["project_id"] not in project_ids_intersection:
-                    include_time_entry = False
-            if include_time_entry:
-                filtered_time_entries.append(time_entry)
+                    continue
+            filtered_time_entries.append(time_entry)
         return filtered_time_entries
 
     @staticmethod
