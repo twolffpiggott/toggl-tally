@@ -85,10 +85,7 @@ def hours(
             end_date=tally.now,
         )
     filtered_time_entries = filter.filter_time_entries(response=unfiltered_time_entries)
-    # exclude running entries
-    seconds_worked = sum(
-        entry["duration"] for entry in filtered_time_entries if entry["duration"] > 0
-    )
+    seconds_worked = sum(entry["duration"] for entry in filtered_time_entries)
     target_seconds = hours_per_month * 60 * 60
     seconds_outstanding = max(target_seconds - seconds_worked, 0)
     reporter = RichReport(console)
