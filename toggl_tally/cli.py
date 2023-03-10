@@ -10,20 +10,13 @@ from toggl_tally import RichReport, TogglAPI, TogglFilter, TogglTally
 
 @click.group()
 @click.option(
-    "--config", default="config.yml", type=click.Path(exists=True, path_type=Path)
+    "--config", "-c", default="config.yml", type=click.Path(exists=True, path_type=Path)
 )
 @click.pass_context
 def toggl_tally(ctx: click.Context, config: Path):
     with config.open("r") as f:
         config_dict = yaml.safe_load(f)
     ctx.default_map = dict(hours=config_dict)
-
-
-def _comma_separated_arg_split(ctx, param, value):
-    if value is None:
-        return []
-    options = [option.strip() for option in value.split(",")]
-    return options
 
 
 @toggl_tally.command()
@@ -39,18 +32,21 @@ def _comma_separated_arg_split(ctx, param, value):
 )
 @click.option(
     "--workspaces",
-    callback=_comma_separated_arg_split,
-    help="Comma-separated list of workspaces",
+    "-w",
+    multiple=True,
+    help="Workspace(s) to filter time entries by",
 )
 @click.option(
     "--clients",
-    callback=_comma_separated_arg_split,
-    help="Comma-separated list of clients",
+    "-c",
+    multiple=True,
+    help="Client(s) to filter time entries by",
 )
 @click.option(
     "--projects",
-    callback=_comma_separated_arg_split,
-    help="Comma-separated list of projects",
+    "-p",
+    multiple=True,
+    help="Project(s) to filter time entries by",
 )
 @click.option(
     "--skip-today",

@@ -24,7 +24,7 @@ class TogglTally(object):
         skip_today: bool = False,
         timezone: Union[str, None] = None,
         working_days: List[str] = ["MO", "TU", "WE", "TH", "FR"],
-        country_str: str = "ZA",
+        country: str = "ZA",
         exclude_public_holidays: bool = True,
     ):
         self.invoice_day_of_month = invoice_day_of_month
@@ -32,9 +32,7 @@ class TogglTally(object):
         self.timezone = tz.gettz(timezone) if timezone is not None else None
         self.working_days = _get_rrule_days(working_days)
         self._working_day_ints = [DAY_OF_WEEK[day_str] for day_str in working_days]
-        self.public_holidays = holidays.country_holidays(
-            country_str, years=self.now.year
-        )
+        self.public_holidays = holidays.country_holidays(country, years=self.now.year)
         self.exclude_public_holidays = exclude_public_holidays
 
     @property
