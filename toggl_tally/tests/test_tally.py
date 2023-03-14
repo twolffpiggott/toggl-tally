@@ -216,3 +216,9 @@ def test_toggle_tally_rrule_day_strs_fails_for_invalid():
     )
     with pytest.raises(ValueError, match=exception_match_str):
         sut._get_rrule_days(["MO", "FO"])
+
+
+def test_toggle_tally_rrule_day_strs_fails_for_empty():
+    exception_match_str = re.escape("Working days should be non-empty")
+    with pytest.raises(ValueError, match=exception_match_str):
+        sut._get_rrule_days([])

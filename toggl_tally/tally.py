@@ -21,10 +21,10 @@ class TogglTally(object):
     def __init__(
         self,
         invoice_day_of_month: int,
+        country: str,
         skip_today: bool = False,
         timezone: Union[str, None] = None,
         working_days: List[str] = ["MO", "TU", "WE", "TH", "FR"],
-        country: str = "ZA",
         exclude_public_holidays: bool = True,
     ):
         self.invoice_day_of_month = invoice_day_of_month
@@ -178,6 +178,8 @@ class TogglTally(object):
 
 def _get_rrule_days(day_strings: List[str]):
     rrule_days = []
+    if not day_strings:
+        raise ValueError("Working days should be non-empty")
     for day_str in day_strings:
         try:
             rrule_day = getattr(rrule, day_str)

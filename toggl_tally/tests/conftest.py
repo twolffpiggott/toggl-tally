@@ -14,6 +14,7 @@ def toggl_tally_object(request):
         mock_toggl_tally_now.return_value = kwargs["now"]
         tally_object = TogglTally(
             invoice_day_of_month=kwargs.get("invoice_day_of_month", 1),
+            country=kwargs.get("country", "ZA"),
             skip_today=kwargs.get("skip_today", False),
             exclude_public_holidays=kwargs.get("exclude_public_holidays", True),
         )

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import click
 import yaml
@@ -7,27 +7,37 @@ from rich.console import Console
 
 from toggl_tally import RichReport, TogglAPI, TogglFilter, TogglTally
 
+CONTEXT_SETTINGS = dict(
+    help_option_names=["-h", "--help"], auto_envvar_prefix="TOGGL_TALLY"
+)
 
-@click.group()
+
+@click.group(context_settings=CONTEXT_SETTINGS)
 @click.option(
-    "--config", "-c", default="config.yml", type=click.Path(exists=True, path_type=Path)
+    "--config",
+    "-c",
+    type=click.Path(exists=True, path_type=Path),
+    help="Path to optional yaml config with CLI option values",
 )
 @click.pass_context
-def toggl_tally(ctx: click.Context, config: Path):
-    with config.open("r") as f:
-        config_dict = yaml.safe_load(f)
-    ctx.default_map = dict(hours=config_dict)
+def toggl_tally(ctx: click.Context, config: Optional[Path]):
+    if config is not None:
+        with config.open("r") as f:
+            config_dict = yaml.safe_load(f)
+        ctx.default_map = dict(hours=config_dict)
 
 
-@toggl_tally.command()
+@toggl_tally.command(context_settings=CONTEXT_SETTINGS)
 @click.option(
     "--hours-per-month",
     type=int,
+    required=True,
     help="Target working hours per month",
 )
 @click.option(
     "--invoice-day",
     type=int,
+    required=True,
     help="Invoicing day of month",
 )
 @click.option(
@@ -55,6 +65,30 @@ def toggl_tally(ctx: click.Context, config: Path):
     default=False,
     help="Exclude today from remaining working days for the month",
 )
+@click.option(
+    "--timezone",
+    "-tz",
+    help="Timezone for time entries",
+)
+@click.option(
+    "--working-days",
+    "-wd",
+    multiple=True,
+    default=["MO", "TU", "WE", "TH", "FR"],
+    help="Days of week over which you work ('MO', 'TU', ...)",
+)
+@click.option(
+    "--country",
+    required=True,
+    help="Your country code (used to determine holiday dates)",
+)
+@click.option(
+    "--exclude-public-holidays",
+    is_flag=True,
+    show_default=True,
+    default=True,
+    help="Whether to assume public holidays are not working days",
+)
 @click.pass_context
 def hours(
     ctx: click.Context,
@@ -64,10 +98,21 @@ def hours(
     clients: List[str],
     projects: List[str],
     skip_today: bool,
+    timezone: Optional[str],
+    working_days: List[str],
+    country: str,
+    exclude_public_holidays: bool,
 ):
     console = Console()
     api = TogglAPI()
-    tally = TogglTally(invoice_day_of_month=invoice_day, skip_today=skip_today)
+    tally = TogglTally(
+        invoice_day_of_month=invoice_day,
+        country=country,
+        skip_today=skip_today,
+        timezone=timezone,
+        working_days=working_days,
+        exclude_public_holidays=exclude_public_holidays,
+    )
     with console.status("[bold dark_cyan]Getting clients, projects and workspaces"):
         filter = TogglFilter(
             api=api,
