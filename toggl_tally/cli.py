@@ -12,7 +12,10 @@ CONTEXT_SETTINGS = dict(
 )
 
 
-@click.group(context_settings=CONTEXT_SETTINGS)
+@click.group(
+    context_settings=CONTEXT_SETTINGS,
+    help="A rich CLI to track hours worked against monthly targets with toggl",
+)
 @click.option(
     "--config",
     "-c",
@@ -27,7 +30,10 @@ def toggl_tally(ctx: click.Context, config: Optional[Path]):
         ctx.default_map = dict(hours=config_dict)
 
 
-@toggl_tally.command(context_settings=CONTEXT_SETTINGS)
+@toggl_tally.command(
+    context_settings=CONTEXT_SETTINGS,
+    help="Get remaining daily hours to hit monthly target",
+)
 @click.option(
     "--hours-per-month",
     type=int,
