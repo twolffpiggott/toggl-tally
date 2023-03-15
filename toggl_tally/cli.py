@@ -95,6 +95,13 @@ def toggl_tally(ctx: click.Context, config: Optional[Path]):
     default=True,
     help="Whether to assume public holidays are not working days",
 )
+@click.option(
+    "--verbose",
+    "-v",
+    is_flag=True,
+    default=False,
+    help="Show active filters and public holidays",
+)
 @click.pass_context
 def hours(
     ctx: click.Context,
@@ -108,6 +115,7 @@ def hours(
     working_days: List[str],
     country: str,
     exclude_public_holidays: bool,
+    verbose: bool,
 ):
     console = Console()
     api = TogglAPI()
@@ -149,10 +157,11 @@ def hours(
     reporter.month_progress_bar(
         seconds_worked=seconds_worked, target_seconds=target_seconds
     )
-    reporter.filters_table(
-        workspaces=workspaces,
-        clients=clients,
-        projects=projects,
-    )
-    if tally.remaining_public_holidays:
-        reporter.holidays_table(holidays=tally.remaining_public_holidays)
+    if verbose:
+        reporter.filters_table(
+            workspaces=workspaces,
+            clients=clients,
+            projects=projects,
+        )
+        if tally.remaining_public_holidays:
+            reporter.holidays_table(holidays=tally.remaining_public_holidays)
