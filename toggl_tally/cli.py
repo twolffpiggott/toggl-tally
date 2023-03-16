@@ -1,3 +1,4 @@
+import ast
 from pathlib import Path
 from typing import List, Optional
 
@@ -10,6 +11,40 @@ from toggl_tally import RichReport, TogglAPI, TogglFilter, TogglTally
 CONTEXT_SETTINGS = dict(
     help_option_names=["-h", "--help"], auto_envvar_prefix="TOGGL_TALLY"
 )
+
+
+def _comma_separated_arg_split(ctx, param, value):
+    """
+    >>> _comma_separated_arg_split(None, None, 'foo,bar,baz')
+    ['foo', 'bar', 'baz']
+    >>> _comma_separated_arg_split(None, None, "['foo', 'bar']")
+    ['foo', 'bar']
+    >>> _comma_separated_arg_split(None, None, None)
+    []
+    >>> _comma_separated_arg_split(None, None, "foo bar")
+    ['foo bar']
+    >>> _comma_separated_arg_split(None, None, "['foo bar']")
+    ['foo bar']
+    """
+    if value is None:
+        return []
+    # values read from yaml config will be a list cast to str
+    error_msg = f"Expected comma-separated list but got {value}"
+    try:
+        options = ast.literal_eval(value)
+    except (SyntaxError, ValueError):
+        # should be dealing with a comma-separated list of strs
+        try:
+            options = [option.strip() for option in value.split(",")]
+        except AttributeError:
+            raise ValueError(error_msg)
+    except (TypeError, MemoryError, RecursionError):
+        raise ValueError(error_msg)
+    else:
+        # did we literal eval to the expected type?
+        if not isinstance(options, list):
+            raise ValueError(error_msg)
+    return options
 
 
 @click.group(
@@ -49,20 +84,20 @@ def toggl_tally(ctx: click.Context, config: Optional[Path]):
 @click.option(
     "--workspaces",
     "-w",
-    multiple=True,
-    help="Workspace(s) to filter time entries by",
+    callback=_comma_separated_arg_split,
+    help="Comma-separated workspace(s) to filter time entries by (e.g. 'foo, bar')",
 )
 @click.option(
     "--clients",
     "-c",
-    multiple=True,
-    help="Client(s) to filter time entries by",
+    callback=_comma_separated_arg_split,
+    help="Comma-separated client(s) to filter time entries by (e.g. 'foo, bar')",
 )
 @click.option(
     "--projects",
     "-p",
-    multiple=True,
-    help="Project(s) to filter time entries by",
+    callback=_comma_separated_arg_split,
+    help="Comma-separated project(s) to filter time entries by (e.g. 'foo, bar')",
 )
 @click.option(
     "--skip-today",
@@ -79,9 +114,9 @@ def toggl_tally(ctx: click.Context, config: Optional[Path]):
 @click.option(
     "--working-days",
     "-wd",
-    multiple=True,
+    callback=_comma_separated_arg_split,
     default=["MO", "TU", "WE", "TH", "FR"],
-    help="Days of week over which you work ('MO', 'TU', ...)",
+    help="Comma-separated days of week over which you work (e.g. 'MO, TU')",
 )
 @click.option(
     "--country",
@@ -149,7 +184,8 @@ def hours(
         next_invoice_date=tally.next_invoice_date,
     )
     reporter.report_hours_per_day(
-        seconds_per_day=seconds_outstanding / tally.remaining_working_days,
+        seconds_outstanding=seconds_outstanding,
+        remaining_working_days=tally.remaining_working_days,
         hours_per_month=hours_per_month,
         last_billable_date=tally.last_billable_date,
     )

@@ -17,6 +17,7 @@ class RichReport(object):
         date_style: str = "bold cyan",
         limit_int_style: str = "bold orange1",
         hours_style: str = "bold dark_cyan",
+        error_style: str = "bold red",
         **kwargs,
     ):
         self.console = console
@@ -25,6 +26,7 @@ class RichReport(object):
         self.date_style = date_style
         self.limit_int_style = limit_int_style
         self.hours_style = hours_style
+        self.error_style = error_style
 
     def report_remaining_working_days(
         self, remaining_working_days: int, next_invoice_date: datetime
@@ -37,16 +39,25 @@ class RichReport(object):
 
     def report_hours_per_day(
         self,
-        seconds_per_day: float,
+        seconds_outstanding: float,
+        remaining_working_days: int,
         hours_per_month: float,
         last_billable_date: datetime,
     ):
-        self.console.print(
-            f"Work {self.apply_style(format_seconds(seconds_per_day), 'hours_style')} per day"
-            f" to hit your target of {self.apply_style(hours_per_month, 'limit_int_style')} hours"
-            " on last billable workday"
-            f" {self.apply_style(last_billable_date.strftime(self.date_format), 'date_style')}."
-        )
+        try:
+            seconds_per_day = seconds_outstanding / remaining_working_days
+        except ZeroDivisionError:
+            self.console.print(
+                f"You have {self.apply_style('no working days left', 'error_style')}."
+            )
+        else:
+            self.console.print(
+                f"Work {self.apply_style(format_seconds(seconds_per_day), 'hours_style')} per day"
+                f" to hit your target of {self.apply_style(hours_per_month, 'limit_int_style')}"
+                " hours on last billable workday"
+                f" {self.apply_style(last_billable_date.strftime(self.date_format), 'date_style')}"
+                "."
+            )
 
     def report_hours_worked(self, seconds_worked: float):
         self.console.print(
