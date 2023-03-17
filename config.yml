@@ -1,0 +1,22 @@
+# this is an example config- replace the values with your own
+# save it anywhere you like and set the env var TOGGL_TALLY_CONFIG
+# to the path to this config to use these values by default
+hours_per_month: 160
+invoice_day: 30
+workspaces:
+clients:
+  - MegaCorp
+projects:
+  - Widget Building
+skip_today: false
+# for timezone names see "TZ database name"
+# in https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+timezone: Africa/Johannesburg
+working_days:
+  - MO
+  - TU
+  - WE
+  - TH
+  - FR
+country: ZA
+exclude_public_holidays: true
