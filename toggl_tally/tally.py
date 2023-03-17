@@ -3,7 +3,7 @@ from datetime import date, datetime, timedelta, timezone
 from typing import List, Tuple, Union
 
 import holidays
-from dateutil import rrule, tz
+from dateutil import rrule
 
 from toggl_tally.time_utils import get_current_datetime
 
@@ -29,7 +29,7 @@ class TogglTally(object):
     ):
         self.invoice_day_of_month = invoice_day_of_month
         self.skip_today = skip_today
-        self.timezone = tz.gettz(timezone) if timezone is not None else None
+        self.timezone = timezone
         self.working_days = _get_rrule_days(working_days)
         self._working_day_ints = [DAY_OF_WEEK[day_str] for day_str in working_days]
         self.public_holidays = holidays.country_holidays(country, years=self.now.year)
