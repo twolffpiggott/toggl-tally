@@ -2,7 +2,7 @@
 # save it anywhere you like and set the env var TOGGL_TALLY_CONFIG
 # to the path to this config to use these values by default
 hours_per_month: 160
-invoice_day: 30
+invoice_day: 18
 workspaces:
 clients:
   - MegaCorp

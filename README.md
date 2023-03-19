@@ -1,6 +1,6 @@
 # Toggl Tally
 
-![Hours verbose CLI](imgs/toggl_tally_verbose.gif)
+![Hours verbose CLI](imgs/toggl_tally_verbose_small.gif)
 
 ## Setup
 
