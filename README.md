@@ -1,6 +1,14 @@
 # Toggl Tally
 
-![Hours verbose CLI](imgs/toggl_tally_verbose_small.gif)
+Toggl tally is a rich Python command line interface for tracking progress against your monthly project targets and calculating the daily hours you need to work to hit your goals. Toggl tally connects to the [Toggl Track API](https://developers.track.toggl.com/), and supports:
+
+- Filtering by workspaces, clients or projects
+- Configurable weekly working days
+- Excluding (and reporting upcoming) public holidays in your configured country
+
+<p align="center">
+  <img src="imgs/toggl_tally_verbose_small.gif">
+</p>
 
 ## Setup
 
