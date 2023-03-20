@@ -3,6 +3,7 @@
 Toggl tally is a rich Python command line interface for tracking progress against your monthly project targets and calculating the daily hours you need to work to hit your goals. Toggl tally connects to the [Toggl Track API](https://developers.track.toggl.com/), and supports:
 
 - Filtering by workspaces, clients or projects
+- Configurable invoicing day of month
 - Configurable weekly working days
 - Excluding (and reporting upcoming) public holidays in your configured country
 
@@ -14,15 +15,17 @@ Toggl tally is a rich Python command line interface for tracking progress agains
 
 ### Toggl API token
 
-Get your Toggl API token from the [Toggl profile page](https://track.toggl.com/profile) and set it as the `TOGGL_API_TOKEN` environment variable.
+Toggl tally handles connection to the [Toggl Track API](https://developers.track.toggl.com/); all you need to do is make your Toggl API token available as an environment variable. Get your Toggl API token from the [Toggl profile page](https://track.toggl.com/profile) and set it as the `TOGGL_API_TOKEN` environment variable.
 
 ### Configuration
 
-The `toggl-tally` CLI can be configured via a yaml file. The path to this file can either be passed as a command-line argument (`toggl-tally -c /path/to/config.yaml`) or can be detected automatically from the environment variable `TOGGL_TALLY_CONFIG`.
+Toggl tally needs to be configured with your monthly goals and projects. This configuration can be passed either via a YAML file or via command line arguments and options. YAML file configuration is the most streamlined and DRY for daily use.
+
+The path to the YAML config file can either be passed as a command-line argument (`toggl-tally -c /path/to/config.yaml`) or can be detected automatically from the environment variable `TOGGL_TALLY_CONFIG`.
 
 ![Help](imgs/help.png)
 
-The configurable keys are as below, and as in the example [config](config.yml).
+The configurable keys are as below, and a full example [yaml config](config.yml) is provided with this repo.
 
 ```yaml
 hours_per_month: 160
@@ -48,15 +51,31 @@ Alternatively, all configuration can be passed with command-line arguments to th
 
 ![Help](imgs/hours_help.png)
 
-## Installation
+## Hours command
+
+The `hours` command is the core command for Toggl tally. It reports:
+
+- Working days to go before next invoice date
+- Daily hours needed to hit monthly target by next invoice date
+- Hours worked on relevant projects since last invoice
+- A monthly progress bar
+
+![Hours](imgs/hours.png)
+
+The `hours` command has a `--verbose` (`-v`) flag, which if enabled also reports:
+
+- Active workspace, project and client filters
+- Upcoming public holidays in the working period
+
+![Hours](imgs/hours_verbose.png)
+
+## Development
 
 To install `toggl_tally`, run:
 
 ```bash
 pip install --editable .
 ```
-
-## Development
 
 Code for this repository is checked using [pre-commit](https://pre-commit.com/).
 
