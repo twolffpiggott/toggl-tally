@@ -1,4 +1,4 @@
-name: Toggl Tally tests
+name: Tests
 
 on: [push]
 
