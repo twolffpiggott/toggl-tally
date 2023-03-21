@@ -8,7 +8,7 @@ Toggl tally is a rich Python command line interface for tracking progress agains
 - Excluding (and reporting upcoming) public holidays in your configured country
 
 <p align="center">
-  <img src="imgs/toggl_tally_verbose_small.gif">
+  <img src="https://github.com/twolffpiggott/toggl-tally/raw/main/imgs/toggl_tally_verbose_small.gif">
 </p>
 
 ## Setup
@@ -23,9 +23,9 @@ Toggl tally needs to be configured with your monthly goals and projects. This co
 
 The path to the YAML config file can either be passed as a command-line argument (`toggl-tally -c /path/to/config.yaml`) or can be detected automatically from the environment variable `TOGGL_TALLY_CONFIG`.
 
-![Help](imgs/help.png)
+![Help](https://github.com/twolffpiggott/toggl-tally/raw/main/imgs/help.png)
 
-The configurable keys are as below, and a full example [yaml config](config.yml) is provided with this repo.
+The configurable keys are as below, and a full example [yaml config](https://github.com/twolffpiggott/toggl-tally/blob/main/config.yml) is provided with this repo.
 
 ```yaml
 hours_per_month: 160
@@ -49,7 +49,7 @@ exclude_public_holidays: true
 
 Alternatively, all configuration can be passed with command-line arguments to the `hours` command. See the CLI help for detailed information about each argument and option.
 
-![Help](imgs/hours_help.png)
+![Help](https://github.com/twolffpiggott/toggl-tally/raw/main/imgs/hours_help.png)
 
 ## Hours command
 
@@ -60,14 +60,14 @@ The `hours` command is the core command for Toggl tally. It reports:
 - Hours worked on relevant projects since last invoice
 - A monthly progress bar
 
-![Hours](imgs/hours.png)
+![Hours](https://github.com/twolffpiggott/toggl-tally/raw/main/imgs/hours.png)
 
 The `hours` command has a `--verbose` (`-v`) flag, which if enabled also reports:
 
 - Active workspace, project and client filters
 - Upcoming public holidays in the working period
 
-![Hours](imgs/hours_verbose.png)
+![Hours](https://github.com/twolffpiggott/toggl-tally/raw/main/imgs/hours_verbose.png)
 
 ## Development
 
