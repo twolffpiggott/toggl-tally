@@ -1,5 +1,7 @@
 # Toggl Tally
 
+[![Tests](https://github.com/twolffpiggott/toggl-tally/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/twolffpiggott/toggl-tally/actions/workflows/test.yml)
+
 Toggl tally is a rich Python command line interface for tracking progress against your monthly project targets and calculating the daily hours you need to work to hit your goals. Toggl tally connects to the [Toggl Track API](https://developers.track.toggl.com/), and supports:
 
 - Filtering by workspaces, clients or projects
@@ -10,6 +12,14 @@ Toggl tally is a rich Python command line interface for tracking progress agains
 <p align="center">
   <img src="https://github.com/twolffpiggott/toggl-tally/raw/main/imgs/toggl_tally_verbose_small.gif">
 </p>
+
+## Installation
+
+Install using `pip`:
+
+```
+pip install toggl-tally
+```
 
 ## Setup
 
