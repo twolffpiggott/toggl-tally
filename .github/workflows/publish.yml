@@ -1,4 +1,4 @@
-name: Test Publish Python Package
+name: Publish Python Package
 
 on:
   release:
