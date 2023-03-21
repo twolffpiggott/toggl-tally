@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "toggl-tally"
-version = "0.0.1"
+version = "0.1.0"
 description = "A rich CLI to track hours worked towards monthly targets with toggl"
 readme = "README.md"
 authors = [{ name = "Tim Wolff-Piggott", email = "twolffpiggott@gmail.com" }]
