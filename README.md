@@ -71,19 +71,15 @@ The `hours` command has a `--verbose` (`-v`) flag, which if enabled also reports
 
 ## Development
 
-To install `toggl_tally`, run:
+To install `toggl_tally` for development, run:
 
 ```bash
-pip install --editable .
+pip install -e '.[dev]'
 ```
 
-Code for this repository is checked using [pre-commit](https://pre-commit.com/).
-
-After cloning this repository please run the following steps to initialise pre-commit:
+Code for this repository is checked using [pre-commit](https://pre-commit.com/). After cloning this repository please run the following steps to initialise pre-commit:
 
 ```bash
-pip install pre-commit
-pip install -r requirements/requirements_dev.txt
 pre-commit install --install-hooks
 ```
 
