@@ -100,7 +100,7 @@ def test_get_toggl_entities_fails_for_missing_name(
                 user_clients="user_clients",
                 user_workspaces="user_workspaces",
                 project_names=[],
-                client_names=["Supercorp"],
+                client_names=["Supercorp", "Megacorp"],
                 workspace_names=[],
             ),
             TogglEntities(
@@ -108,6 +108,7 @@ def test_get_toggl_entities_fails_for_missing_name(
                     TogglEntity(id=1000, name="Doohickey design", type="project"),
                     TogglEntity(id=1002, name="Foo implementation", type="project"),
                     TogglEntity(id=1003, name="Bar implementation", type="project"),
+                    TogglEntity(id=1005, name="Baz refactoring", type="project"),
                 ]
             ),
             id="filter_client_projects",
@@ -223,6 +224,22 @@ def test_filter_client_projects(
             ),
             [0, 1, 2, 6],
             id="filter_time_entries_by_project_multiple",
+        ),
+        pytest.param(
+            dict(
+                user_projects="user_projects",
+                user_clients="user_clients",
+                user_workspaces="user_workspaces",
+                project_names=[
+                    "Doohickey design",
+                    "Foo implementation",
+                    "Baz refactoring",
+                ],
+                client_names=["Megacorp"],
+                workspace_names=[],
+            ),
+            [9],
+            id="filter_time_entries_by_project_client_and_project_mismatched",
         ),
     ],
     indirect=["toggl_filter_object"],

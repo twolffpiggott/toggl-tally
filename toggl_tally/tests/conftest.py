@@ -55,6 +55,7 @@ def user_workspaces():
 def user_clients():
     return [
         {"name": "Supercorp", "id": 55, "wid": 10},
+        {"name": "Megacorp", "id": 56, "wid": 10},
         {"name": "Another client", "id": 20, "wid": 10},
         {"name": "Hypermart", "id": 40, "wid": 11},
     ]
@@ -66,6 +67,7 @@ def user_projects():
         {"name": "Doohickey design", "id": 1000, "workspace_id": 10, "client_id": 55},
         {"name": "Foo implementation", "id": 1002, "workspace_id": 10, "client_id": 55},
         {"name": "Bar implementation", "id": 1003, "workspace_id": 10, "client_id": 55},
+        {"name": "Baz refactoring", "id": 1005, "workspace_id": 10, "client_id": 56},
         {"name": "Course work", "id": 1030, "workspace_id": 10, "client_id": None},
         {"name": "Project X", "id": 1001, "workspace_id": 11, "client_id": 40},
     ]
@@ -136,5 +138,12 @@ def time_entries():
             "project_id": 1003,
             "duration": -1678341279,
             "description": "Brainstorm session",
+        },
+        {
+            "id": 1000033,
+            "workspace_id": 10,
+            "project_id": 1005,
+            "duration": 1400,
+            "description": "Method X",
         },
     ]
