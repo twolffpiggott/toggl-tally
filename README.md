@@ -63,6 +63,17 @@ Alternatively, all configuration can be passed with command-line arguments to th
 
 ![Help](https://github.com/twolffpiggott/toggl-tally/raw/main/imgs/hours_help.png)
 
+## Toggl data model
+
+```mermaid
+erDiagram
+    WORKSPACE ||--o{ CLIENT : has
+    WORKSPACE ||--o{ PROJECT : has
+    WORKSPACE ||--o{ TIME_ENTRY : has
+    CLIENT |o--o{ PROJECT : has
+    PROJECT |o--o{ TIME_ENTRY : has
+```
+
 ## Hours command
 
 The `hours` command is the core command for Toggl tally. It reports:
