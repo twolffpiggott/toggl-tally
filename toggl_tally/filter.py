@@ -77,16 +77,16 @@ class TogglFilter(object):
         client_project_ids_set: Set[int],
         project_ids_set: Set[int],
     ) -> bool:
+        """
+        Take the UNION across workspace, client and project filters.
+        i.e. a time entry is included if it belongs to any of the
+        listed workspaces, clients or projects
+        """
         if exclude_running_entries and self._is_running_time_entry(time_entry):
             return False
-        if workspace_ids_set and time_entry["workspace_id"] in workspace_ids_set:
+        if time_entry["workspace_id"] in workspace_ids_set:
             return True
-        if (
-            client_project_ids_set
-            and time_entry["project_id"] in client_project_ids_set
-        ):
-            return True
-        if project_ids_set and time_entry["project_id"] in project_ids_set:
+        if time_entry["project_id"] in client_project_ids_set.union(project_ids_set):
             return True
         return False
 
