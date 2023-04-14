@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass, field
-from typing import List, NamedTuple
+from typing import List, NamedTuple, Set
 
 from toggl_tally import TogglAPI
 
@@ -49,36 +49,56 @@ class TogglFilter(object):
         Time entries only have clients by way of projects
         Projects can have no client
 
-        Caller provides incompatible workspaces and clients -> empty result
+        Take the UNION across workspace, client and project filters.
+        i.e. a time entry is included if it belongs to any of the
+        listed workspaces, clients or projects
         """
-        filter_by_workspace = bool(self.filtered_workspaces)
-        if filter_by_workspace:
-            workspace_ids_set = set(self.filtered_workspaces.entity_ids)
-        filter_by_project = bool(self.filtered_projects) or bool(self.filtered_clients)
-        if filter_by_project:
-            project_id_sets = []
-            if self.filtered_projects:
-                project_id_sets.append(set(self.filtered_projects.entity_ids))
-            if self.filtered_clients:
-                project_id_sets.append(set(self.filtered_client_projects.entity_ids))
-            project_ids_intersection = project_id_sets[0]
-            for project_id_set in project_id_sets[1:]:
-                project_ids_intersection = project_ids_intersection & project_id_set
-        filtered_time_entries = []
-        for time_entry in response:
-            if exclude_running_entries:
-                # running entries have duration = -1 * (Unix start time)
-                # https://developers.track.toggl.com/docs/api/time_entries
-                if time_entry["duration"] < 0:
-                    continue
-            if filter_by_workspace:
-                if time_entry["workspace_id"] not in workspace_ids_set:
-                    continue
-            if filter_by_project:
-                if time_entry["project_id"] not in project_ids_intersection:
-                    continue
-            filtered_time_entries.append(time_entry)
-        return filtered_time_entries
+        workspace_ids_set = self._get_entity_ids_set(self.filtered_workspaces)
+        client_project_ids_set = self._get_entity_ids_set(self.filtered_client_projects)
+        project_ids_set = self._get_entity_ids_set(self.filtered_projects)
+
+        return [
+            time_entry
+            for time_entry in response
+            if self._is_valid_time_entry(
+                time_entry,
+                exclude_running_entries=exclude_running_entries,
+                workspace_ids_set=workspace_ids_set,
+                client_project_ids_set=client_project_ids_set,
+                project_ids_set=project_ids_set,
+            )
+        ]
+
+    def _is_valid_time_entry(
+        self,
+        time_entry: dict,
+        exclude_running_entries: bool,
+        workspace_ids_set: Set[int],
+        client_project_ids_set: Set[int],
+        project_ids_set: Set[int],
+    ) -> bool:
+        """
+        Take the UNION across workspace, client and project filters.
+        i.e. a time entry is included if it belongs to any of the
+        listed workspaces, clients or projects
+        """
+        if exclude_running_entries and self._is_running_time_entry(time_entry):
+            return False
+        if time_entry["workspace_id"] in workspace_ids_set:
+            return True
+        if time_entry["project_id"] in client_project_ids_set.union(project_ids_set):
+            return True
+        return False
+
+    def _get_entity_ids_set(self, filtered_entities: TogglEntities) -> Set[int]:
+        if filtered_entities:
+            return set(filtered_entities.entity_ids)
+        return set()
+
+    def _is_running_time_entry(self, time_entry: dict) -> bool:
+        # Running entries have duration = -1 * (Unix start time)
+        # https://developers.track.toggl.com/docs/api/time_entries
+        return time_entry["duration"] < 0
 
     @staticmethod
     def get_toggl_entities(
