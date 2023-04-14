@@ -63,16 +63,35 @@ Alternatively, all configuration can be passed with command-line arguments to th
 
 ![Help](https://github.com/twolffpiggott/toggl-tally/raw/main/imgs/hours_help.png)
 
-## Toggl data model
+## Toggl data model and filtering
 
 ```mermaid
 erDiagram
     WORKSPACE ||--o{ CLIENT : has
     WORKSPACE ||--o{ PROJECT : has
     WORKSPACE ||--o{ TIME_ENTRY : has
-    CLIENT |o--o{ PROJECT : has
+    CLIENT |o--|{ PROJECT : has
     PROJECT |o--o{ TIME_ENTRY : has
 ```
+
+`toggl_tally` enables filtering by multiple workspace, client or project names. The UNION across all of these entities is taken to determine the final set of time entries. For example, for the filter criteria:
+
+```yaml
+workspaces:
+clients:
+  - MegaCorp
+  - HyperCorp
+projects:
+  - Widget Building
+  - Baz refactoring
+```
+
+A time entry will be included if it:
+
+- Belongs to a project linked to the MegaCorp client OR
+- Belongs to a project linked to the HyperCorp client OR
+- Belongs to the Widget Building project OR
+- Belongs to the Baz refactoring project
 
 ## Hours command
 
