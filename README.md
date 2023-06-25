@@ -1,6 +1,6 @@
 # Toggl Tally
 
-[![Supported Python Versions](https://img.shields.io/pypi/pyversions/toggl-tally/0.1.1)](https://pypi.org/project/toggl-tally/) [![PyPI version](https://badge.fury.io/py/toggl-tally.svg)](https://badge.fury.io/py/toggl-tally)
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/toggl-tally/0.1.2)](https://pypi.org/project/toggl-tally/) [![PyPI version](https://badge.fury.io/py/toggl-tally.svg)](https://badge.fury.io/py/toggl-tally)
 
 [![Tests](https://github.com/twolffpiggott/toggl-tally/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/twolffpiggott/toggl-tally/actions/workflows/test.yml)
 
