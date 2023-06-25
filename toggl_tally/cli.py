@@ -5,6 +5,7 @@ from typing import List, Optional
 import click
 import yaml
 from rich.console import Console
+from rich.traceback import install
 
 from toggl_tally import RichReport, TogglAPI, TogglFilter, TogglTally
 
@@ -59,6 +60,8 @@ def _comma_separated_arg_split(ctx, param, value):
 )
 @click.pass_context
 def toggl_tally(ctx: click.Context, config: Optional[Path]):
+    # rich traceback handling
+    install(max_frames=1)
     if config is not None:
         with config.open("r") as f:
             config_dict = yaml.safe_load(f)
@@ -171,7 +174,7 @@ def hours(
         )
     with console.status("[bold dark_cyan]Getting time entries"):
         unfiltered_time_entries = api.get_time_entries_between(
-            start_date=tally.last_invoice_date,
+            start_date=tally.first_billable_date,
             end_date=tally.now,
         )
     filtered_time_entries = filter.filter_time_entries(response=unfiltered_time_entries)

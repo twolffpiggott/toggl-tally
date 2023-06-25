@@ -19,12 +19,11 @@ class TogglAPI(object):
         self.session = requests.Session()
 
     def auth(self):
-        try:
-            api_token = os.environ["TOGGL_API_TOKEN"]
-        except KeyError as exception:
+        api_token = os.getenv("TOGGL_API_TOKEN")
+        if api_token is None:
             raise KeyError(
                 "Please ensure that the 'TOGGL_API_TOKEN' environment variable is set"
-            ) from exception
+            )
         self.session.auth = (api_token, "api_token")
 
     def get_time_entries_between(self, start_date: datetime, end_date: datetime):
