@@ -78,6 +78,12 @@ def test_toggl_tally_next_working_day(toggl_tally_object, expected_next_working_
             datetime(2023, 3, 20),
             id="invoice_date_current_month_public_holiday",
         ),
+        pytest.param(
+            dict(now=datetime(2023, 6, 17), invoice_day_of_month=20),
+            datetime(2023, 5, 19),
+            datetime(2023, 6, 20),
+            id="invoice_date_weekend",
+        ),
     ],
     indirect=["toggl_tally_object"],
 )
@@ -100,6 +106,11 @@ def test_toggl_tally_invoice_dates(
             dict(now=datetime(2023, 3, 1), invoice_day_of_month=26),
             datetime(2023, 3, 24),
             id="last_billable_date_inclusive",
+        ),
+        pytest.param(
+            dict(now=datetime(2023, 5, 17), invoice_day_of_month=20),
+            datetime(2023, 5, 19),
+            id="last_billable_date_inclusive_2",
         ),
         pytest.param(
             dict(now=datetime(2023, 3, 1), invoice_day_of_month=21),
@@ -222,3 +233,25 @@ def test_toggle_tally_rrule_day_strs_fails_for_empty():
     exception_match_str = re.escape("Working days should be non-empty")
     with pytest.raises(ValueError, match=exception_match_str):
         sut._get_rrule_days([])
+
+
+@pytest.mark.parametrize(
+    "toggl_tally_object,expected_first_billable_date",
+    [
+        pytest.param(
+            dict(now=datetime(2023, 6, 18), invoice_day_of_month=19),
+            datetime(2023, 5, 19),
+            id="first_billable_date_inclusive",
+        ),
+        pytest.param(
+            dict(now=datetime(2023, 6, 19), invoice_day_of_month=20),
+            datetime(2023, 5, 20),
+            id="first_billable_date_exclusive",
+        ),
+    ],
+    indirect=["toggl_tally_object"],
+)
+def test_toggl_tally_first_billable_date(
+    toggl_tally_object, expected_first_billable_date
+):
+    assert toggl_tally_object.first_billable_date == expected_first_billable_date

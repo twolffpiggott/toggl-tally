@@ -71,6 +71,16 @@ class TogglTally(object):
             return self.current_month_invoice_date
 
     @property
+    def first_billable_date(self) -> datetime:
+        last_invoice_date = self.last_invoice_date
+        if last_invoice_date.day < self.invoice_day_of_month:
+            # Return the next day
+            return last_invoice_date + timedelta(days=1)
+        else:
+            # Return the last invoice date
+            return last_invoice_date
+
+    @property
     def next_invoice_date(self) -> datetime:
         if self.now < self.current_month_invoice_date:
             return self.current_month_invoice_date
